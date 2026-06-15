@@ -1,0 +1,27 @@
+volumes:
+  config_ha:
+
+networks:
+  front-tier:
+    name: internet-monitoring-front-tier
+    external: true
+
+services:
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - config_ha:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    ports:
+      - 8123:8123
+    restart: always
+    privileged: true
+    environment:
+      TZ: '{{ homeassistant_timezone }}'
+    networks:
+      - front-tier

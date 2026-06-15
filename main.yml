@@ -39,6 +39,10 @@
       ansible.builtin.import_tasks: tasks/wireguard.yml
       when: wireguard_enable
 
+    - name: Set up Home Assistant.
+      ansible.builtin.import_tasks: tasks/home-assistant.yml
+      when: homeassistant_enable
+
     - name: Set up Pi Hole.
       ansible.builtin.import_tasks: tasks/pi-hole.yml
       when: pihole_enable
