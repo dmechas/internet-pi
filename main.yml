@@ -43,6 +43,10 @@
       ansible.builtin.import_tasks: tasks/home-assistant.yml
       when: homeassistant_enable
 
+    - name: Set up Jellyfin.
+      ansible.builtin.import_tasks: tasks/jellyfin.yml
+      when: jellyfin_enable
+
     - name: Set up Pi Hole.
       ansible.builtin.import_tasks: tasks/pi-hole.yml
       when: pihole_enable

@@ -1,0 +1,24 @@
+---
+- name: Create Jellyfin folder on Pi.
+  ansible.builtin.file:
+    path: "{{ config_dir }}/jellyfin"
+    state: directory
+    mode: 0755
+  become: false
+  register: jellyfin_dir
+
+- name: Copy Jellyfin docker-compose template to Pi.
+  ansible.builtin.template:
+    src: templates/jellyfin-docker-compose.yml.j2
+    dest: "{{ jellyfin_dir.path }}/docker-compose.yml"
+    mode: "0640"
+  become: false
+  notify: Restart jellyfin
+
+# TODO: The first time this playbook is run, the `pi` user may not be added
+# to the `docker` group, so this task may fail.
+- name: Ensure Jellyfin is running.
+  community.docker.docker_compose_v2:
+    project_src: "{{ jellyfin_dir.path }}/"
+    build: never
+  become: false

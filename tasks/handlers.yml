@@ -20,6 +20,13 @@
     state: restarted
   become: false
 
+- name: Restart jellyfin
+  community.docker.docker_compose_v2:
+    project_src: "{{ config_dir }}/jellyfin/"
+    build: never
+    state: restarted
+  become: false
+
 - name: Restart internet-monitoring
   community.docker.docker_compose_v2:
     project_src: "{{ config_dir }}/internet-monitoring/"
