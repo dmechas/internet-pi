@@ -29,3 +29,10 @@
     project_src: "{{ config_dir }}/mktxp/"
     build: never
   become: false
+
+- name: Copy MikroTik dashboard config to grafana.
+  ansible.builtin.copy:
+    src: files/mikrotik-router.json
+    dest: "{{ config_dir }}/internet-monitoring/grafana/provisioning/dashboards/"
+    mode: 0644
+  become: false

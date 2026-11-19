@@ -20,6 +20,15 @@
     state: restarted
   become: false
 
+- name: Restart grafana
+  community.docker.docker_compose_v2:
+    project_src: "{{ config_dir }}/internet-monitoring/"
+    services:
+      - grafana
+    build: never
+    state: restarted
+  become: false
+
 - name: Restart internet-monitoring
   community.docker.docker_compose_v2:
     project_src: "{{ config_dir }}/internet-monitoring/"

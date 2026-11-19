@@ -19,6 +19,7 @@
     recursive: true
     perms: false
   become: false
+  notify: Restart grafana  # datasource provisioning is only read at startup
 
 # This is an upgrade task from 1.x to 2.x - can be removed for 3.x.
 - name: Ensure internet-monitoring directory is not a Git repository.
