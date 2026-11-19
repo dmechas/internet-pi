@@ -56,3 +56,10 @@
     build: never
     state: restarted
   become: false
+
+- name: Restart tailscale
+  community.docker.docker_compose_v2:
+    project_src: "{{ config_dir }}/tailscale/"
+    build: never
+    state: restarted
+  become: false

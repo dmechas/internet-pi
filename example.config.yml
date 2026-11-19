@@ -9,6 +9,20 @@ domain_pihole: 'pihole'          # to access pihole via: http://pihole.home.loca
 domain_grafana: 'grafana'        # to access grafana via: http://grafana.home.local
 domain_prometheus: 'prometheus'  # to access prometheus via: http://prometheus.home.local
 
+# Tailscale Funnel configuration.
+# Runs a userspace Tailscale node on the Pi and uses Tailscale Funnel to expose
+# one local service (Home Assistant by default) on the public internet at
+# https://<tailscale_hostname>.<tailnet>.ts.net. Before enabling, in the
+# Tailscale admin console: create the tag below in the ACL policy (with
+# "tagOwners"), enable Funnel in the policy for that tag, and generate a
+# reusable, pre-authorized auth key for it. The key is only needed for the first
+# login; afterwards the node's state is kept in ~/tailscale/ts-state.
+tailscale_enable: false
+tailscale_authkey: "tskey-auth-change-this"
+tailscale_hostname: ha-mcp                        # becomes ha-mcp.<tailnet>.ts.net
+tailscale_advertise_tags: "tag:funnel"
+tailscale_funnel_target: "http://127.0.0.1:8123"  # local service Funnel proxies to
+
 # Pi-hole configuration.
 pihole_enable: true
 pihole_hostname: pihole

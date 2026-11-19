@@ -1,0 +1,34 @@
+---
+- name: Create Tailscale folder on Pi.
+  ansible.builtin.file:
+    path: "{{ config_dir }}/tailscale"
+    state: directory
+    mode: 0755
+  become: false
+  register: tailscale_dir
+
+- name: Copy templated Tailscale files into place.
+  ansible.builtin.template:
+    src: templates/{{ item.src }}
+    dest: "{{ tailscale_dir.path }}/{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: tailscale-docker-compose.yml.j2
+      dest: docker-compose.yml
+      mode: '0640'
+    - src: tailscale-serve.json.j2
+      dest: serve.json
+      mode: '0640'
+    - src: tailscale.env.j2
+      dest: .env
+      mode: '0600'
+  become: false
+  notify: Restart tailscale
+
+# TODO: The first time this playbook is run, the `pi` user may not be added
+# to the `docker` group, so this task may fail.
+- name: Ensure Tailscale is running.
+  community.docker.docker_compose_v2:
+    project_src: "{{ tailscale_dir.path }}/"
+    build: never
+  become: false
