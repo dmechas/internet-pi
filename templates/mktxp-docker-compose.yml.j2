@@ -1,0 +1,25 @@
+# {{ ansible_managed }}
+---
+networks:
+{# mktxp shares a network with Prometheus so the metrics endpoint (which lists
+   DHCP leases, firewall rules, etc.) is not published on the Pi's LAN interfaces. #}
+  back-tier:
+    name: internet-monitoring-back-tier
+    external: true
+
+services:
+  mktxp:
+    container_name: mktxp
+    image: ghcr.io/akpw/mktxp:latest
+    networks:
+      - back-tier
+    expose:
+      - 49090
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+{# Mounted read-only on purpose: mktxp rewrites its config files at startup to
+   append missing keys, which would make the Ansible template tasks report a
+   change on every run. Read-only, it logs a warning and uses built-in defaults. #}
+      - ./mktxp.conf:/etc/mktxp/mktxp.conf:ro
+      - ./_mktxp.conf:/etc/mktxp/_mktxp.conf:ro
+    restart: unless-stopped

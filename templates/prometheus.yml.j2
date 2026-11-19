@@ -49,6 +49,15 @@ scrape_configs:
       - targets: ['172.17.0.1:9817']
 {% endif %}
 
+{% if mktxp_enable %}
+  - job_name: 'mikrotik'
+    metrics_path: /metrics
+    scrape_interval: 30s
+    scrape_timeout: 20s  # mktxp queries many RouterOS collectors per scrape
+    static_configs:
+      - targets: ['mktxp:49090']
+{% endif %}
+
   - job_name: 'ping'
     metrics_path: /probe
     scrape_interval: {{ monitoring_ping_interval }}

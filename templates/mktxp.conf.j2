@@ -1,0 +1,45 @@
+# {{ ansible_managed }}
+## MKTXP router entries. One section per RouterOS device.
+## Keys left out of a router section fall back to the [default] section below;
+## anything not listed here uses the exporter's built-in defaults.
+
+[{{ mktxp_router_name }}]
+    hostname = """{{ mktxp_router_hostname }}"""
+    username = """{{ mktxp_router_username }}"""
+    password = """{{ mktxp_router_password }}"""
+
+[default]
+    enabled = True
+    port = {{ mktxp_router_api_port }}
+    use_ssl = {{ mktxp_router_use_ssl }}
+    no_ssl_certificate = {{ mktxp_router_use_ssl }}
+    ssl_certificate_verify = False
+    plaintext_login = True
+
+    health = True
+    installed_packages = True
+    dhcp = True
+    dhcp_lease = True
+    connections = True
+    connection_stats = False
+    interface = True
+    routerboard = {{ mktxp_collect_routerboard }}
+    route = True
+    pool = True
+    firewall = True
+    neighbor = False
+    dns = {{ mktxp_collect_dns }}
+
+    poe = False
+    monitor = True
+    netwatch = True
+    public_ip = True
+    wireless = {{ mktxp_collect_wireless }}
+    wireless_clients = {{ mktxp_collect_wireless }}
+    capsman = {{ mktxp_collect_capsman }}
+    capsman_clients = {{ mktxp_collect_capsman }}
+
+    user = True
+    queue = {{ mktxp_collect_queue }}
+    check_for_updates = True
+    interface_name_format = comment

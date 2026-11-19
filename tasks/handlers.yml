@@ -40,3 +40,10 @@
     build: never
     state: restarted
   become: false
+
+- name: Restart mktxp
+  community.docker.docker_compose_v2:
+    project_src: "{{ config_dir }}/mktxp/"
+    build: never
+    state: restarted
+  become: false

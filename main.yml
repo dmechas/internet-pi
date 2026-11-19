@@ -58,3 +58,7 @@
     - name: Set up Starlink Monitoring.
       ansible.builtin.import_tasks: tasks/starlink.yml
       when: starlink_enable
+
+    - name: Set up MikroTik Monitoring.
+      ansible.builtin.import_tasks: tasks/mktxp.yml
+      when: mktxp_enable

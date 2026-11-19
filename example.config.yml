@@ -48,3 +48,27 @@ airgradient_sensors:
 
 # Starlink configuration. (Also requires `monitoring_enable`)
 starlink_enable: false
+
+# MikroTik (MKTXP) configuration. (Also requires `monitoring_enable`)
+# Before enabling, create a read-only API user on the router and make sure the
+# API service is enabled and reachable from the Pi (firewall permitting):
+#   /user group add name=mktxp_group policy=api,read
+#   /user add name=mktxp_user group=mktxp_group password=<strong-password>
+#   /ip service enable api
+# The exporter runs as uid 1000 inside its container, so the Ansible user on the
+# Pi must be uid 1000 (the default on Raspberry Pi OS) for it to read mktxp.conf.
+mktxp_enable: false
+mktxp_router_name: my-router           # label used for the router in metrics
+mktxp_router_hostname: 192.168.88.1
+mktxp_router_username: mktxp_user
+mktxp_router_password: "change-this-password"
+# With use_ssl false the password crosses your LAN unencrypted on every scrape
+# (plain API, port 8728). With true, API-SSL on 8729 is used, but the router's
+# (usually self-signed) certificate is not verified.
+mktxp_router_use_ssl: false
+mktxp_router_api_port: "{{ 8729 if mktxp_router_use_ssl else 8728 }}"
+mktxp_collect_routerboard: true        # firmware / RouterBOARD info
+mktxp_collect_dns: true                # DNS cache stats (not shown in the dashboard)
+mktxp_collect_wireless: false          # set true for routers with built-in WiFi
+mktxp_collect_capsman: false           # set true if the router runs CAPsMAN
+mktxp_collect_queue: false             # set true if you use simple queues / queue trees

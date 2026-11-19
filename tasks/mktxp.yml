@@ -1,0 +1,31 @@
+---
+- name: Ensure MikroTik directory exists.
+  ansible.builtin.file:
+    path: "{{ config_dir }}/mktxp"
+    state: directory
+    mode: 0755
+  become: false
+
+- name: Copy templated MikroTik files into place.
+  ansible.builtin.template:
+    src: templates/{{ item.src }}
+    dest: "{{ config_dir }}/mktxp/{{ item.dest }}"
+    mode: "{{ item.mode }}"
+  loop:
+    - src: mktxp-docker-compose.yml.j2
+      dest: docker-compose.yml
+      mode: '0640'
+    - src: mktxp.conf.j2
+      dest: mktxp.conf
+      mode: '0600'
+    - src: _mktxp.conf.j2
+      dest: _mktxp.conf
+      mode: '0640'
+  become: false
+  notify: Restart mktxp
+
+- name: Ensure MikroTik Prometheus exporter is running.
+  community.docker.docker_compose_v2:
+    project_src: "{{ config_dir }}/mktxp/"
+    build: never
+  become: false
