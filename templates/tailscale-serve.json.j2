@@ -10,8 +10,8 @@
         }
       }
     }
-  },
+  }{% if tailscale_funnel_enable | default(false) | bool %},
   "AllowFunnel": {
     "${TS_CERT_DOMAIN}:443": true
-  }
+  }{% endif %}
 }

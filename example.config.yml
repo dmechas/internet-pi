@@ -21,7 +21,10 @@ tailscale_enable: false
 tailscale_authkey: "tskey-auth-change-this"
 tailscale_hostname: ha-mcp                        # becomes ha-mcp.<tailnet>.ts.net
 tailscale_advertise_tags: "tag:funnel"
-tailscale_funnel_target: "http://127.0.0.1:8123"  # local service Funnel proxies to
+tailscale_funnel_target: "http://127.0.0.1:8123"  # local service Serve/Funnel proxies to
+# false = Tailscale Serve: only devices on your tailnet can reach the service.
+# true  = Tailscale Funnel: the service is public on the internet.
+tailscale_funnel_enable: false
 
 # Pi-hole configuration.
 pihole_enable: true
