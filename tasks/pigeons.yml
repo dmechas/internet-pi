@@ -1,0 +1,85 @@
+---
+# Pigeons runs on the host (not in Docker) as a root systemd service, so these
+# tasks use the play's `become: true`.
+
+- name: Map CPU architecture to the Pigeons download target.
+  ansible.builtin.set_fact:
+    pigeons_target: >-
+      {{ {'aarch64': 'linux-aarch64', 'arm64': 'linux-aarch64', 'x86_64': 'linux-x86_64'}
+         .get(ansible_facts.architecture, '') }}
+
+- name: Fail on unsupported architectures.
+  ansible.builtin.fail:
+    msg: >-
+      Pigeons has no Linux build for '{{ ansible_facts.architecture }}'.
+      Use a 64-bit OS (aarch64 or x86_64), or set pigeons_enable to false.
+  when: pigeons_target == ''
+
+- name: Check whether the Pigeons binary is installed.
+  ansible.builtin.stat:
+    path: /usr/local/bin/pigeons
+  register: pigeons_binary
+
+# Only downloads when missing (or when pigeons_update is true), so routine runs
+# don't silently upgrade to whatever "latest" is that day.
+- name: Download the Pigeons binary.
+  ansible.builtin.get_url:
+    url: "https://vorc.s3.amazonaws.com/pigeons-{{ pigeons_target }}-latest"
+    dest: /usr/local/bin/pigeons
+    owner: root
+    group: root
+    mode: "0755"
+    force: "{{ pigeons_update | bool }}"
+  when: not pigeons_binary.stat.exists or pigeons_update | bool
+  notify: Restart pigeons
+
+- name: Ensure the Pigeons config directory exists.
+  ansible.builtin.file:
+    path: /etc/pigeons
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+# Edits only this key, leaving anything else Pigeons wrote to the file alone.
+- name: Set Pigeons telemetry preference.
+  community.general.ini_file:
+    path: /etc/pigeons/config.toml
+    option: telemetry_enabled
+    value: "{{ pigeons_telemetry_enabled | bool | lower }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart pigeons
+
+# `creates` makes this a no-op when the service was already installed (by hand
+# or by an earlier run), so the existing install and its key are left alone.
+- name: Install the Pigeons systemd service.
+  ansible.builtin.command:
+    cmd: /usr/local/bin/pigeons service install --ssh-port {{ pigeons_ssh_port }}
+    creates: /etc/systemd/system/pigeons.service
+
+- name: Ensure Pigeons is running and enabled at boot.
+  ansible.builtin.systemd_service:
+    name: pigeons
+    state: started
+    enabled: true
+
+- name: Read the Pigeons endpoint ID from the service log.
+  ansible.builtin.shell:
+    cmd: >-
+      set -o pipefail;
+      journalctl -u pigeons --no-pager -o cat
+      | grep -oE 'id: [0-9a-f]{64}' | tail -n 1 | cut -d' ' -f2
+    executable: /bin/bash
+  register: pigeons_endpoint_id
+  changed_when: false
+  failed_when: false
+
+- name: Show the Pigeons endpoint ID.
+  ansible.builtin.debug:
+    msg: >-
+      Pigeons endpoint ID: {{ pigeons_endpoint_id.stdout }}.
+      On your laptop: pigeons add --id <this ID> --name <name>.
+      Keep it private: anyone with it can reach this machine's sshd.
+  when: pigeons_endpoint_id.stdout | default('') | length > 0

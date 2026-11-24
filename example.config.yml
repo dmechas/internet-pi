@@ -26,6 +26,17 @@ tailscale_funnel_target: "http://127.0.0.1:8123"  # local service Serve/Funnel p
 # true  = Tailscale Funnel: the service is public on the internet.
 tailscale_funnel_enable: false
 
+# Pigeons configuration.
+# SSH into the Pi from anywhere via Pigeons (https://github.com/n0-computer/pigeons),
+# with no port forwarding or VPN. Requires a 64-bit OS. The playbook prints the
+# endpoint ID; add it on your laptop with:
+#   pigeons add --id <endpoint id> --name <name>
+# Keep the endpoint ID private: anyone with it can reach the Pi's sshd.
+pigeons_enable: false
+pigeons_ssh_port: 22
+pigeons_update: false              # true re-downloads the latest binary
+pigeons_telemetry_enabled: false
+
 # Pi-hole configuration.
 pihole_enable: true
 pihole_hostname: pihole

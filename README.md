@@ -24,6 +24,7 @@ Other features:
   - **AirGradient Monitoring**: Configures [`airgradient-prometheus`](https://github.com/geerlingguy/airgradient-prometheus) and a Grafana dashboard, which tracks and displays air quality over time via one or more AirGradient DIY monitors. (Disabled by default. Enable and configure using the `airgradient_enable` var in `config.yml`. See example configuration for ability to monitor multiple AirGradient DIY stations.)
   - **Starlink Monitoring**: Installs a [`starlink` prometheus exporter](https://github.com/danopstech/starlink_exporter) and a Grafana dashboard, which tracks and displays Starlink statistics. (Disabled by default. Enable and configure using the `starlink_enable` var in `config.yml`.)
   - **Tailscale Funnel**: Runs a [Tailscale](https://tailscale.com) node in userspace mode and uses [Funnel](https://tailscale.com/kb/1223/funnel) to expose a local service (Home Assistant by default) on the public internet at `https://<hostname>.<tailnet>.ts.net`. (Disabled by default. Enable and configure using the `tailscale_*` vars in `config.yml`. See example configuration for the tag, ACL and auth key you must set up in the Tailscale admin console first.)
+  - **Pigeons**: Installs [Pigeons](https://github.com/n0-computer/pigeons) as a systemd service so you can SSH into the Pi from anywhere, peer-to-peer over [iroh](https://iroh.computer), with no port forwarding or VPN. The playbook prints the endpoint ID to add on your laptop with `pigeons add`. (Disabled by default. Enable and configure using the `pigeons_*` vars in `config.yml`. Requires a 64-bit OS.)
   - **MikroTik Monitoring**: Installs the [`mktxp` prometheus exporter](https://github.com/akpw/mktxp) and a Grafana dashboard (adapted from [`mktxp-stack`](https://github.com/akpw/mktxp-stack)), which tracks and displays RouterOS statistics (interfaces, DHCP leases, firewall, RouterBOARD info, etc.) from a MikroTik router on the local network. (Disabled by default. Enable and configure using the `mktxp_*` vars in `config.yml`. See example configuration for the read-only API user you must create on the router first.)
 
 **IMPORTANT NOTE**: If you use the included Internet monitoring, it will download a decently-large amount of data through your Internet connection on a daily basis. Don't use it, or tune the `internet-monitoring` setup to not run the speedtests as often, if you have a metered connection!
@@ -138,6 +139,8 @@ docker system prune -af
 Do the same thing for any of the other optional directories added by this project (e.g. `shelly-plug-prometheus`, `starlink-exporter`, `mktxp`, `tailscale`, etc.).
 
 You can then delete the `internet-monitoring`, `pi-hole`, etc. folders and everything will be gone from your system.
+
+Pigeons is installed on the host rather than in Docker. Remove it with `sudo pigeons service uninstall` and then `sudo rm /usr/local/bin/pigeons`.
 
 ## License
 

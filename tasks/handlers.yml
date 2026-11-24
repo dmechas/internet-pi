@@ -63,3 +63,8 @@
     build: never
     state: restarted
   become: false
+
+- name: Restart pigeons
+  ansible.builtin.systemd_service:
+    name: pigeons
+    state: restarted
